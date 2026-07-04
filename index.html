@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Human Resource Management System</title>
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; }
+    .card { background: white; max-width: 400px; margin: 80px auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+    .dashboard { background: white; max-width: 900px; margin: 20px auto; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    button { width: 100%; padding: 12px; background: #007BFF; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; }
+    button:hover { background: #0056b3; }
+    .btn-danger { background: #dc3545; }
+    .btn-danger:hover { background: #c82333; }
+    .btn-success { background: #28a745; }
+    .btn-success:hover { background: #218838; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background-color: #f8f9fa; }
+    .hidden { display: none; }
+    .nav { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+    .logout-btn { background: none; color: #dc3545; width: auto; padding: 5px 10px; border: 1px solid #dc3545; }
+    .logout-btn:hover { background: #dc3545; color: white; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  </style>
+</head>
+<body>
+
+  <!-- 1. LOGIN PAGE -->
+  <div id="loginPage" class="card">
+    <h2>HRMS Login</h2>
+    <input type="email" id="loginEmail" placeholder="Email (Try: admin@hr.com or emp@hr.com)">
+    <input type="password" id="loginPassword" placeholder="Password (Try: 123)">
+    <button onclick="handleLogin()">Login</button>
+    <p style="font-size: 14px; margin-top: 15px;">New User? <a href="#" onclick="showPage('signupPage')">Create Account</a></p>
+  </div>
+
+  <!-- 2. SIGNUP PAGE -->
+  <div id="signupPage" class="card hidden">
+    <h2>Create Account</h2>
+    <input type="text" id="signupName" placeholder="Full Name">
+    <input type="email" id="signupEmail" placeholder="Email Address">
+    <input type="password" id="signupPassword" placeholder="Password">
+    <select id="signupRole">
+      <option value="Employee">Employee</option>
+      <option value="Admin">Admin</option>
+    </select>
+    <button onclick="handleSignup()" class="btn-success">Register</button>
+    <p style="font-size: 14px; margin-top: 15px;"><a href="#" onclick="showPage('loginPage')">Back to Login</a></p>
+  </div>
+
+  <!-- 3. DASHBOARD PAGE -->
+  <div id="dashboardPage" class="dashboard hidden">
+    <div class="nav">
+      <h2>Welcome, <span id="userGreeting">User</span> (<span id="userRoleBadge">Role</span>)</h2>
+      <button class="logout-btn" onclick="handleLogout()">Sign Out</button>
+    </div>
+
+    <div class="grid">
+      <div>
+        <h3>Your Profile Details</h3>
+        <p><strong>Email:</strong> <span id="profEmail"></span></p>
+        <label>Phone:</label>
+        <input type="text" id="profPhone">
+        <label>Address:</label>
+        <input type="text" id="profAddress">
+        <p><strong>Designation:</strong> <span id="profDesignation"></span></p>
+        <p><strong>Salary:</strong> $<span id="profSalary"></span></p>
+        <button onclick="updateSelfProfile()">Save Profile Changes</button>
+      </div>
+
+      <div id="adminPanel" class="hidden">
+        <h3>Admin Tools - Employee Management</h3>
+        <p style="color: #666; font-size: 14px;">Modify values directly in the rows and click Update.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Designation</th>
+              <th>Salary</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="employeeTableBody">
+            <!-- Simulated database content loads here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // In-Memory Simulated Database
+    let usersDb = [
+      { id: "1", name: "Admin Manager", email: "admin@hr.com", password: "123", role: "Admin", phone: "987654", address: "HQ Office", jobTitle: "HR Director", salary: 95000 },
+      { id: "2", name: "John Doe", email: "emp@hr.com", password: "123", role: "Employee", phone: "123456", address: "Main St 10", jobTitle: "Associate", salary: 45000 }
+    ];
+
+    let currentUser = null;
+
+    function showPage(pageId) {
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('signupPage').classList.add('hidden');
+      document.getElementById('dashboardPage').classList.add('hidden');
+      document.getElementById(pageId).classList.remove('hidden');
+    }
+
+    function handleLogin() {
+      const email = document.getElementById('loginEmail').value;
+      const pass = document.getElementById('loginPassword').value;
+      const user = usersDb.find(u => u.email === email && u.password === pass);
+
+      if (user) {
+        currentUser = user;
+        loadDashboard();
+      } else {
+        alert('Invalid email or password.');
+      }
+    }
+
+    function handleSignup() {
+      const name = document.getElementById('signupName').value;
+      const email = document.getElementById('signupEmail').value;
+      const password = document.getElementById('signupPassword').value;
+      const role = document.getElementById('signupRole').value;
+
+      if(!name || !email || !password) return alert('Fill out all fields!');
+
+      usersDb.push({
+        id: Date.now().toString(),
+        name, email, password, role,
+        phone: "", address: "", jobTitle: "Associate", salary: 30000
+      });
+
+      alert('Account registered! Please login.');
+      showPage('loginPage');
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      showPage('loginPage');
+    }
+
+    function loadDashboard() {
+      document.getElementById('userGreeting').innerText = currentUser.name;
+      document.getElementById('userRoleBadge').innerText = currentUser.role;
+      document.getElementById('profEmail').innerText = currentUser.email;
+      document.getElementById('profPhone').value = currentUser.phone;
+      document.getElementById('profAddress').value = currentUser.address;
+      document.getElementById('profDesignation').innerText = currentUser.jobTitle;
+      document.getElementById('profSalary').innerText = currentUser.salary;
+
+      if (currentUser.role === 'Admin') {
+        document.getElementById('adminPanel').classList.remove('hidden');
+        renderEmployeeTable();
+      } else {
+        document.getElementById('adminPanel').classList.add('hidden');
+      }
+      showPage('dashboardPage');
+    }
+
+    function updateSelfProfile() {
+      currentUser.phone = document.getElementById('profPhone').value;
+      currentUser.address = document.getElementById('profAddress').value;
+      alert('Your profile changes have been saved!');
+      if(currentUser.role === 'Admin') renderEmployeeTable();
+    }
+
+    function renderEmployeeTable() {
+      const tbody = document.getElementById('employeeTableBody');
+      tbody.innerHTML = '';
+      
+      usersDb.forEach(emp => {
+        if(emp.role === 'Employee') {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${emp.name}</strong><br><small>${emp.email}</small></td>
+            <td><input type="text" value="${emp.phone}" id="p-${emp.id}" style="margin:0; padding:5px;"></td>
+            <td><input type="text" value="${emp.jobTitle}" id="j-${emp.id}" style="margin:0; padding:5px;"></td>
+            <td><input type="number" value="${emp.salary}" id="s-${emp.id}" style="margin:0; padding:5px;"></td>
+            <td>
+              <button onclick="adminUpdateUser('${emp.id}')" style="padding:4px; font-size:12px; margin-bottom:4px;">Update</button>
+              <button onclick="adminDeleteUser('${emp.id}')" class="btn-danger" style="padding:4px; font-size:12px;">Delete</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        }
+      });
+    }
+
+    function adminUpdateUser(id) {
+      const emp = usersDb.find(u => u.id === id);
+      if(emp) {
+        emp.phone = document.getElementById(`p-${id}`).value;
+        emp.jobTitle = document.getElementById(`j-${id}`).value;
+        emp.salary = Number(document.getElementById(`s-${id}`).value);
+        alert(`Updated details for ${emp.name}!`);
+        loadDashboard();
+      }
+    }
+
+    function adminDeleteUser(id) {
+      if(confirm('Are you sure you want to delete this employee profile?')) {
+        usersDb = usersDb.filter(u => u.id !== id);
+        loadDashboard();
+      }
+    }
+  </script>
+</body>
+</html>
