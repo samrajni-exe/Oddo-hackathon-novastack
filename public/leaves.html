@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CoreHR Suite | Leaves</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand">📊 CoreHR Engine</div>
+        <nav class="sidebar-menu">
+            <a href="attendance.html" class="sidebar-link">⏱️ Attendance Log</a>
+            <a href="leaves.html" class="sidebar-link active">📅 Leave Sabbaticals</a>
+            <a href="payroll.html" class="sidebar-link">💸 Payroll Ledger</a>
+        </nav>
+    </div>
+    <div class="main-content">
+        <div class="top-navbar">
+            <h1 class="page-title">Smart Leave Lifecycle Architecture</h1>
+            <div class="status-badge"><span class="status-dot"></span> Cache Active</div>
+        </div>
+        <div class="page-pane">
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Employee Leave Request Dispatch</h3>
+                    <form action="/api/leaves" method="POST">
+                        <div class="form-group">
+                            <label>Employee Identifier Token</label>
+                            <input type="text" name="employeeId" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Leave Classification Variant</label>
+                            <select name="type">
+                                <option value="Paid">Paid Executive Leave</option>
+                                <option value="Sick">Validated Medical Absence</option>
+                                <option value="Unpaid">Unpaid Personal Sabbatical</option>
+                            </select>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:1;">
+                                <label>Commence Date</label>
+                                <input type="date" name="startDate" required>
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label>Termination Date</label>
+                                <input type="date" name="endDate" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Justification Remarks</label>
+                            <input type="text" name="remarks" placeholder="Optional comments...">
+                        </div>
+                        <button type="submit">Dispatch Request Stack</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3>Admin State Machine Lifecycle</h3>
+                    <form action="/api/leaves/status" method="POST">
+                        <div class="form-group">
+                            <label>Target Entry HUID Token (_id)</label>
+                            <input type="text" name="leaveId" placeholder="Paste structural _id key" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Lifecycle Target Override</label>
+                            <select name="newStatus">
+                                <option value="Approved">Enforce State: Approved</option>
+                                <option value="Rejected">Enforce State: Rejected</option>
+                            </select>
+                        </div>
+                        <button type="submit" style="background:#0f172a;">Commit State Transition</button>
+                    </form>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Centralized Leave Registries</h3>
+                <button class="secondary" onclick="fetchData('/api/leaves', 'leaveBox')">Refresh Central Repositories</button>
+                <pre id="leaveBox" class="ledger-box">// Run system synchronization query...</pre>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

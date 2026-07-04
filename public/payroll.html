@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CoreHR Suite | Payroll</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand">📊 CoreHR Engine</div>
+        <nav class="sidebar-menu">
+            <a href="attendance.html" class="sidebar-link">⏱️ Attendance Log</a>
+            <a href="leaves.html" class="sidebar-link">📅 Leave Sabbaticals</a>
+            <a href="payroll.html" class="sidebar-link active">💸 Payroll Ledger</a>
+        </nav>
+    </div>
+    <div class="main-content">
+        <div class="top-navbar">
+            <h1 class="page-title">Financial Compensation Processing Matrix</h1>
+            <div class="status-badge"><span class="status-dot"></span> Cache Active</div>
+        </div>
+        <div class="page-pane">
+            <div class="card">
+                <h3>Run Financial Comp Calculations</h3>
+                <form action="/api/payroll" method="POST">
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1;">
+                            <label>Employee ID Token</label>
+                            <input type="text" name="employeeId" required>
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Fiscal Allocation Month</label>
+                            <input type="text" name="month" placeholder="e.g. October" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Base Salary Standard Valuation ($)</label>
+                        <input type="number" name="baseSalary" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1;">
+                            <label>Discretionary Allowances ($)</label>
+                            <input type="number" name="allowances" value="0">
+                        </div>
+                        <div class="form-group" style="flex:1;">
+                            <label>Compulsory Deductions ($)</label>
+                            <input type="number" name="deductions" value="0">
+                        </div>
+                    </div>
+                    <button type="submit">Execute Salary Computation Matrix</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Auditable Financial History Logs</h3>
+                <button class="secondary" onclick="fetchData('/api/payroll', 'payBox')">Audit Historical Payroll</button>
+                <pre id="payBox" class="ledger-box">// Run live balance audit...</pre>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

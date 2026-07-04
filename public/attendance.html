@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CoreHR Suite | Attendance</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand">📊 CoreHR Engine</div>
+        <nav class="sidebar-menu">
+            <a href="attendance.html" class="sidebar-link active">⏱️ Attendance Log</a>
+            <a href="leaves.html" class="sidebar-link">📅 Leave Sabbaticals</a>
+            <a href="payroll.html" class="sidebar-link">💸 Payroll Ledger</a>
+        </nav>
+    </div>
+    <div class="main-content">
+        <div class="top-navbar">
+            <h1 class="page-title">Attendance & Identity Verification</h1>
+            <div class="status-badge"><span class="status-dot"></span> Cache Active</div>
+        </div>
+        <div class="page-pane">
+            <div class="card">
+                <h3>Log Identity Shift Matrix</h3>
+                <form action="/api/attendance" method="POST">
+                    <div class="form-group">
+                        <label>Employee Identifier Token</label>
+                        <input type="text" name="employeeId" placeholder="e.g. EMP_801" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Shift Allocation Variant</label>
+                        <select name="status">
+                            <option value="Present">Present (Full Shift)</option>
+                            <option value="Absent">Absent Status</option>
+                            <option value="Half-day">Half-Day Shift Allocation</option>
+                            <option value="Leave">Authorized Leave Overlap</option>
+                        </select>
+                    </div>
+                    <button type="submit">Publish Shift Record</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Real-Time Attendance Streams</h3>
+                <button class="secondary" onclick="fetchData('/api/attendance', 'attBox')">Sync Ledger Streams</button>
+                <pre id="attBox" class="ledger-box">// Sync streams to fetch data...</pre>
+            </div>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
